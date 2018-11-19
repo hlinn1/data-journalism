@@ -1,3 +1,5 @@
+// select t
+
 // Define SVG area
 var svgWidth = 980;
 var svgHeight = 600;
@@ -51,27 +53,77 @@ d3.csv('assets/data/data.csv', function(error, data) {
         .classed('stateCircle', true)
         .attr('cx', d => xLinearScale1(d.income))
         .attr('cy', d => yLinearScale1(d.obesity))
-        .attr('r', '10')
+        .attr('r', '12')
         .attr('fill-opacity', 0.8);
 
-    data.forEach((d,i) => 
-        chartGroup.append('text')
-            .data(data)
-            .attr('x', d => xLinearScale1(d.income))
-            .attr('y', d => yLinearScale1(d.obesity))
-            .text(d => d.abbr)
-    );
+    chartGroup.append('text')
+        .selectAll('tspan')
+        .data(data)
+        .enter()
+        .append('tspan')
+        .classed('stateText', true)
+        .attr('x', function(d) {return xLinearScale1(d.income)})
+        .attr('y', function(d) {return yLinearScale1(d.obesity)})
+        .attr('dominant-baseline', 'middle')
+        .text(d => d.abbr);
 
+        // chartGroup.append('text')
+        //     .classed('stateText', true)
+        //     .attr('x', d => xLinearScale1(d.income))
+        //     .attr('y', d => yLinearScale1(d.obesity))
+        //     .text(d => d.abbr);
+
+    // append axis labels
     svg.append('text')
         .attr('x', 65)
         .attr('y', 280)
         .style('writing-mode', 'tb')
         .classed('aText', true)
         .text('Obesity (%)');
+
+    svg.append('text')
+        .attr('x', 50)
+        .attr('y', 280)
+        .style('writing-mode', 'tb')
+        .classed('aText', true)
+        .text('Smokes (%)');
     
     svg.append('text')
-        .attr('x', 480)
-        .attr('y', 530)
+        .attr('x', 35)
+        .attr('y', 280)
+        .style('writing-mode', 'tb')
         .classed('aText', true)
-        .text('Income (Median)');
-})
+        .text('Lacks Healthcare (%)');
+
+    svg.append('text')
+        .attr('x', 480)
+        .attr('y', 535)
+        .classed('aText', true)
+        .text('Household Income (Median)');
+
+    svg.append('text')
+        .attr('x', 480)
+        .attr('y', 552)
+        .classed('aText', true)
+        .text('Age (Median)');
+
+    svg.append('text')
+        .attr('x', 480)
+        .attr('y', 570)
+        .classed('aText', true)
+        .text('In Poverty (%)');
+
+    // append tool tip to circles 
+    var toolTip = d3.select('body').append('div')
+        .attr('class', 'd3-tip');
+    
+    circles.on('mouseover', function (d, i) {
+        toolTip.style('display', 'block');
+        toolTip.html(`<h4>${d.state}</h4> <br> <h4> Household Income: ${d.income} </h4> <br> <h4> Obesity: ${d.obesity}</h4> `)
+            .style('left', d3.event.pageX + 'px')
+            .style('top', d3.event.pageY + 'px');
+    })
+        // .on('mouseout', function() {
+        //     toolTip.style('display', 'none');
+        // })
+});
